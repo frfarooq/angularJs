@@ -1,0 +1,492 @@
+﻿
+@{
+    ViewBag.Title = "AccommodationDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ 
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js" type="text/javascript"></script>
+<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript"></script>
+@*if (Session["LanguageName"].ToString() == "ar" || Session["LanguageName"].ToString() == "fa" || Session["LanguageName"].ToString() == "ur")
+{
+    <style> 
+          .MultiLang {
+              display: inline-block !important;
+          }
+    </style> 
+}*@
+<style>
+    .MultiLang {
+        display: none;
+    }
+
+    .panel.localnav {
+        margin-top: -28px;
+    }
+
+    button.btn.btn-block.btn-default {
+        font-size: 12px;
+    }
+
+    .btn-default {
+        color: #111;
+        background-color: #ffffff;
+        border-color: #ffffff;
+        box-shadow: none;
+    }
+
+    a.local {
+        color: black;
+    }
+
+    .btn-default.focus, .btn-default.hover, .btn-default:focus, .btn-default:hover {
+        color: #ffffff;
+        background-color: #e6e6e6 !important;
+        border-color: #f3f7f9;
+        box-shadow: none;
+    }
+
+    .page-header-actions {
+        position: absolute;
+        top: 50%;
+        right: -25px;
+        margin: auto;
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+
+    a.btn.btn-sm.btn-icon.btn-default.btn-outline.btn-round {
+        color: #ff1515;
+        border: #284273 1px solid;
+    }
+</style>
+<style>
+    .MultiLang {
+        display: none;
+    }
+
+    @@media (min-width: 768px) {
+        .form-horizontal .form-control-label {
+            padding-top: 7px;
+            margin-bottom: 0;
+            text-align: left !important;
+        }
+    }
+    .row-lg {
+        margin-right: -1.786rem;
+        margin-left: -0.786rem;
+    }
+</style>
+
+    <div class="panel localnav">
+        <div class="search-form inventory-search-form">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-2">
+                        <button type="button" style="background-color: #f0f1f3;" class="btn btn-block btn-default"><a class="local" href="@Url.Action("AccommodationDetails", "Home")">Accommodations Details</a> </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-default"><a class="local" href="@Url.Action("AdditionalDetails", "Home")">Additional Details</a></button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-default"><a class="local" href="@Url.Action("AccommodationsImages", "Home")">Accommodation Images</a></button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-default"><a class="local" href="@Url.Action("ManageLocation", "Home")">Manage Location</a></button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-default"><a class="local" href="@Url.Action("AccommodationFacilities", "Home")">Accommodation Facilities</a></button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-default"><a class="local" href="@Url.Action("GetRoom", "Inventory")">All Rooms</a> </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1 class="page-title"><i class="fa fa-circle" aria-hidden="true"></i>  Accommodations Details <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.AccommodationDetails</span></h1>
+        @*<ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Forms</a></li>
+                <li class="breadcrumb-item active">Validation</li>
+            </ol>*@
+        <div class="page-header-actions">
+          
+                <a href="" target="_blank" data-original-title="Website" class="btn btn-sm btn-icon btn-default btn-outline btn-round" target="_blank" href=""> <i class="icon wb-desktop" aria-hidden="true"></i>  Website</a>
+           
+                <button type="button" class="btn btn-sm btn-icon btn-default btn-outline btn-round" data-target="#exampleNiftyFadeScale"
+                        data-toggle="modal" data-original-title="Website">
+                    <i class="icon wb-edit" aria-hidden="true"></i> Create Website
+                </button> 
+        </div>
+    </div>
+                 
+    <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"></h3>
+                    </div>
+                    <div class="panel-body" ng-app="MyApp" ng-controller="MyController">
+                        <div ng-show="showLoader">
+                            <!-- so this div containing img will be dislpayed only when the showLoader is equal to true-->
+                            <img src="~/Image/demo_wait.gif" />
+                        </div>
+                        <div class="row row-lg">
+                            <form class="row row-lg" name="AccommodationDetailsform" novalidate ng-submit="AccommodationDetailform.$valid && AccommodationDetail()" />
+                                <div class="col-xl-6 form-horizontal">
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Accommodation Name <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.AccommodationName</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="ContactNo" disabled value="" placeholder="ContactNo" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Accommodation Type <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.AccommodationType</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <select class="form-control" id="AccommodationTypeId" name="AccommodationTypeId" required ng-options="AT.AccommodationTypeId as AT.AccommodationTypeName for AT in AccommodationType" ng-model="AccommodationDetails.AccommodationTypeId">
+                                                <option value="" selected disabled>Choose Accommodation Type</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Accommodation Address <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.AccommodationAddress</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="Address" value=" " placeholder="Address" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Zip/Post Code <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.ZipPostCode</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="ContactNo" disabled value=" " placeholder="PostCode" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Country <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.Country</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <select class="form-control" id="CountryId" onchange="GetCities(this.value)" name="CountryId" required ng-options="CounId.CountryId as CounId.CountryName for CounId in Country" ng-model="SaveAccommodation.CountryId">
+                                                <option value="" selected disabled>Choose Country </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            City  <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.City</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <select class="form-control" id="CityId" name="AddressId" required ng-model="AccommodationDetails.AddressId">
+                                                <option value="" selected disabled>Choose City</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Location <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.Location</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" disabled value="" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Star Class <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.StarClass</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <select class="form-control" id="Rating" name="Rating" required="" data-fv-field="company" ng-model="AccommodationDetails.AccommodationTypeId">
+                                                <option></option>
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Website <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.Website</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="Website" value="" placeholder="Website" ng-model="AccommodationDetails.AccommodationTypeId">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Hotel Logo <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.HotelLogo</span>
+                                            <span class="required"></span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="file" name="Files" id="imgInp" style="padding-left: 28px; margin-bottom: 20px;" onchange="readURL(this)" ng-model="AccommodationDetails.AccommodationTypeId">
+                                            <img id="blah" src="#" height="50" width="50" style=" padding: 5px; margin: 0px 6px 21px -3px;" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 form-horizontal">
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            General E-mail <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.GeneralEmail</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="icon wb-envelope" aria-hidden="true"></i>
+                                                </span>
+                                                <input type="text" class="form-control" name="EmailId" value=" " placeholder="email@email.com" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                       required="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Total Number of Rooms <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.TotalNumberofRooms</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="TotalRooms" value="" placeholder="TotalRooms" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            General Telephone Number <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.GeneralTelephoneNumber</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="ContactNo" value="" placeholder="ContactNo" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Fax Number  <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.FaxNumber</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" name="FaxNo" value=" " placeholder="FaxNo" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Choose to Receive Confirmation of Bookings By <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.ChoosetoReceiveConfirmationofBookingsBy</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <select class="form-control" id="BookingMediaId" name="BookingMediaId" required="" ng-model="AccommodationDetails.AccommodationTypeId"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="BEmail">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Booking Confirmation Email  <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.BookingConfirmationEmail</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" id="BookingMediaEmail" name="BookingMediaEmail" value="" placeholder="BookingMediaEmail" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="BFax">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            Booking Confirmation Fax <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.BookingConfirmationFax</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class=" col-xl-12 col-md-9">
+                                            <input type="text" class="form-control" id="BookingMediaFax" name="BookingMediaFax" value="" placeholder="BookingMediaFax" ng-model="AccommodationDetails.AccommodationTypeId"
+                                                   required="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+
+                                            Accommodation Description <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.AccommodationDescription</span> :(Roomph)
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <textarea class="form-control" style="min-height:127px" name="GeneralDescription" rows="3" placeholder="" required="" data-fv-field="skills" ng-model="AccommodationDetails.AccommodationTypeId"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-xl-12 col-md-3 form-control-label">
+                                            What Guest Like Best About This Property? <span class="MultiLang"> @BookingWhizzAdmins.Resourecs.HomeTexts.WhatGuestLikeBestAboutThisProperty</span>
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-xl-12 col-md-9">
+                                            <textarea class="form-control" style="min-height:127px" name="AreaOfInterest" rows="2" placeholder="" data-fv-field="skills" ng-model="AccommodationDetails.AccommodationTypeId"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-xl-12 text-right padding-top-m">
+                                    <button type="submit" class="btn btn-primary" ng-disabled="saveAccommodationform.$invalid">{{btntext}}</button> 
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                                      
+<!-- Modal -->
+    <div class="modal fade modal-fade-in-scale-up" id="exampleNiftyFadeScale" aria-hidden="true"
+         aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-simple">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <h4 class="modal-title">Create Website</h4>
+                </div>
+                <div class="modal-body">
+                    Are you Sure !
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="saveNewRoomType">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- End Modal -->
+
+<script>
+    var app = angular.module('MyApp', ['ui.bootstrap'])
+    app.filter('startFrom', function () {
+        return function (input, start) {
+            if (input) {
+                start = +start;
+                return input.slice(start);
+            }
+            return [];
+        };
+    });
+    app.controller('MyController', function ($scope, $http, $window) {
+        //Get All User
+
+        //-------------- Get Accommodation Types
+        var request = {
+            method: 'get',
+            url: '/JsonAng/AccommodationTypes',
+            dataType: 'json',
+            contentType: "application/json"
+        };
+        $scope.ArrayACType = new Array;
+        $http(request)
+            .success(function (jsonData) {
+                $scope.ArrayACType = jsonData;
+                $scope.AccommodationType = $scope.ArrayACType;
+                $scope.showLoader = false;
+            })
+            .error(function () {
+                $("#Failure").show();
+            });
+       //-------------- Get Accommodation Types
+
+        //-------------- Get Country
+        var request = {
+            method: 'get',
+            url: '/JsonAng/Country',
+            dataType: 'json',
+            contentType: "application/json"
+        };
+        $scope.ArrayCountry = new Array;
+        $http(request)
+            .success(function (jsonData) {
+                $scope.ArrayCountry = jsonData;
+                $scope.Country = $scope.ArrayCountry;
+                $scope.showLoader = false;
+            })
+            .error(function () {
+                $("#Failure").show();
+            });
+        //-------------- Get Country
+
+        $scope.btntext = "Submit";
+    });
+</script>
+<script src="~/global/vendor/jquery/jquery.min.js"></script> 
+<script>
+    $(document).ready(function () {
+        $("#BEmail").hide();
+        $("#BFax").hide();
+         
+        $('#BookingMediaId').on('change', function () {
+            if ($("#BookingMediaId").val() == 1) {
+                $("#BEmail").show();
+                $("#BFax").hide();
+                $("#BookingMediaFax").val('') == null;
+            }
+            if ($("#BookingMediaId").val() == 2) {
+                $("#BEmail").hide();
+                $("#BookingMediaEmail").val('') == null;
+                $("#BFax").show();
+            }
+            if ($("#BookingMediaId").val() == 3) {
+                $("#BEmail").show();
+                $("#BFax").show();
+            }
+        })
+    });
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#blah')
+                    .attr('src', e.target.result)
+                    .width(50)
+                    .height(50);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+     
+    function GetCities(CountryId)
+    {
+        var res = CountryId.split(":");
+        CountryId = res[1];
+        var url = '@Url.Action("Cities", "JsonAng")';
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { CountryId: CountryId },
+            dataType: "json",
+            success: function (result) {
+                $('#CityId')
+                    .empty()
+                    .append('<option selected="selected" value="whatever">- Selected City -</option>');
+                $.each(result, function (el, val, ) {
+                    $('#CityId').append('<option value="' + val.AddressId + '">' + val.CityName + '</option>');
+                });
+            },
+            error: function (result) {
+
+                alert("Error");
+                $("#Failure").show();
+            }
+        });
+    }
+</script>

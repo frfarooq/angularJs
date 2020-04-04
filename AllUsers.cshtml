@@ -1,0 +1,250 @@
+﻿@*  *@
+@{
+    ViewBag.Title = "AllUsers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ 
+ 
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js" type="text/javascript"></script>
+<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript"></script>
+<style>
+    @@media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #no-more-tables table,
+        #no-more-tables thead,
+        #no-more-tables tbody,
+        #no-more-tables th,
+        #no-more-tables td,
+        #no-more-tables tr {
+            display: block;
+        }
+            /* Hide table headers (but not display: none;, for accessibility) */
+            #no-more-tables thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+        #no-more-tables tr {
+            border: 1px solid #ccc;
+        }
+
+        #no-more-tables td {
+            /* Behave  like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+            #no-more-tables td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+            }
+            /*
+    Label the data
+    */
+            #no-more-tables td:before {
+                content: attr(data-title);
+            }
+</style>
+<style>
+    li.ng-scope.active {
+        background-color: #ddd;
+    }
+
+    li.ng-scope {
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style>
+
+<style>
+    .table-bordered td, .table-bordered th {
+        border: 1px solid #e4eaec;
+        padding: 0.572rem;
+    }
+</style>
+
+ <style>
+    /* Important part */
+    .modal-dialog {
+        overflow-y: initial !important
+    }
+
+    .modal-body {
+        height: 250px;
+        overflow-y: auto;
+    }
+
+    .modal-dialog-main {
+        overflow-y: initial !important
+    }
+
+    .scrolcss {
+        height: 400px;
+        overflow-y: auto;
+    }
+</style>
+
+   
+<div class="page-header">
+    <h1 class="page-title"><i class="fa fa-circle" aria-hidden="true"></i> All Users</h1>
+
+    <div class="page-header-actions">
+     
+    </div>
+</div>
+<div class="panel" ng-app="MyApp" ng-controller="MyController">
+    <header class="panel-heading"></header>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-15">
+                    @*<span>@Session["User"]</span>*@
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2" style="float: right !important;padding: 5px; margin-right: 15px;">
+            <input type="text" class="form-control" placeholder="Search User" ng-model="searchFish">
+        </div>
+        <div class="col-md-12 scrolcss">
+            <table class="col-md-12 table-bordered table-striped table-condensed cf">
+                <thead class="cf">
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Id</th>
+                        <th>User Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="gradeA" ng-repeat="u in Users | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit| orderBy:sortType:sortReverse  | filter:searchFish">
+                        <td data-title="UserName">{{u.UserName}}</td>
+                        <td data-title="LoginId">{{u.LoginId}}</td>
+                        <td data-title="UserType">{{u.UserTypeName}}</td>
+                        <td data-title="edit">
+                            <select class="form-control" id="StatusId-{{u.UserId }}" ng-model="StatusId" name="StatusId" ng-change="changestatus(StatusId,u.UserId);" required="" data-fv-field="company">
+                                <option ng-selected="u.StatusId==1" ng-model="StatusIdEnable" ng-value="1">Enable</option>
+                                <option ng-selected="u.StatusId==2" ng-model="StatusIdEnable" ng-value="2">Disable</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+         </div>
+    </div>
+
+    @*<div class="form-group" ng-init="changed=0">
+
+        <div class="col-sm-offset-2 col-sm-10 well">
+
+            <h3>A demo of np-change</h3>
+
+            <div class="checkbox">
+
+                <label>
+
+                    <select ng-change="chkChanged(selectDemo)" class="form-control" ng-model="selectDemo">
+
+                        <option value="1">abc</option> 
+                        <option value="2">xyz</option> 
+                        <option value="3">edf</option>
+
+                    </select>
+
+
+                </label>
+
+                <div><b>Total number of times options selected</b> {{changed}} </div>
+            </div>
+
+        </div>
+
+    </div>*@
+</div>
+
+<script>
+    var app = angular.module('MyApp', ['ui.bootstrap'])
+    app.filter('startFrom', function () {
+        return function (input, start) {
+            if (input) {
+                start = +start;
+                return input.slice(start);
+            }
+            return [];
+        };
+    });
+    app.controller('MyController', function ($scope, $http, $window) {
+
+        //Grt
+        var request = {
+            method: 'get',
+            url: '/JsonAng/GetAllUsers',
+            dataType: 'json',
+            contentType: "application/json"
+        };
+        $scope.arrBirds = new Array;
+
+        $http(request)
+            .success(function (jsonData) {
+                $scope.arrBirds = jsonData;
+                $scope.Users = $scope.arrBirds; 
+                 
+        //--onchange func dropdown 
+            })
+            .error(function () {
+
+            });
+        // 
+
+        $scope.changestatus = function (StatusId, UserId) {
+            //alert(StatusId);
+            //alert(UserId);
+            //
+            $http({
+                url: '/Account/UserActive',
+                method: "POST",
+                data: { 'UserId': UserId, 'StatusId': StatusId }
+            })
+                .then(function (response) { 
+                    $scope.Jsondata = response.data; 
+                    if ($scope.Jsondata == "Success")
+                    {
+                        $("#Success").show(); $window.scrollTo(0, 0);
+                    }
+                    else
+                    {
+                        $("#Failure").show(); $window.scrollTo(0, 0);
+                    } 
+                    // success
+                },
+                function (response) { // optional
+                    alert("failed"); // failed
+                });
+        //
+        };
+        //
+        //$scope.isChange = false; 
+        //$scope.chkChanged = function (selectDemo) {
+        //    $scope.isChange = true;
+        //    $scope.changed = selectDemo;
+        //}
+    });
+</script>  
+ 

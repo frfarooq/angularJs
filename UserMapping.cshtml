@@ -1,0 +1,464 @@
+﻿
+@{
+    ViewBag.Title = "UserMapping";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js" type="text/javascript"></script>
+<script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript"></script>
+<style>
+    @@media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #no-more-tables table,
+        #no-more-tables thead,
+        #no-more-tables tbody,
+        #no-more-tables th,
+        #no-more-tables td,
+        #no-more-tables tr {
+            display: block;
+        }
+            /* Hide table headers (but not display: none;, for accessibility) */
+            #no-more-tables thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+        #no-more-tables tr {
+            border: 1px solid #ccc;
+        }
+
+        #no-more-tables td {
+            /* Behave  like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+            #no-more-tables td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+            }
+            /*
+    Label the data
+    */
+            #no-more-tables td:before {
+                content: attr(data-title);
+            }
+</style>
+<style>
+    li.ng-scope.active {
+        background-color: #ddd;
+    }
+
+    li.ng-scope {
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style> 
+<style>
+    .table-bordered td, .table-bordered th {
+        border: 1px solid #e4eaec;
+        padding: 0.572rem;
+    }
+</style> 
+<style>
+    /* Important part */
+    .modal-dialog {
+        overflow-y: initial !important
+    }
+    .modal-body {
+        height: 250px;
+        overflow-y: auto;
+    }
+
+    .modal-dialog-main {
+        overflow-y: initial !important
+    }
+
+    .scrolcss {
+        height: 400px;
+        overflow-y: auto;
+    }
+    @@media (min-width: 768px) {
+        .modal-dialog-imp {
+            width: auto;
+            margin: 30px 120px auto;
+        }
+    }
+    .modal-content-imp {
+        border: none;
+        width: 185% !important;
+        height:500px;
+    }
+    .modal-bdy-demo {
+        height: 400px; 
+    }
+    .modal-con-demo {
+        width: 190%;
+        margin-left: -267px;
+        /* margin-right: -223px !important; */
+        /* border: red 0px solid; */
+    }
+</style>
+
+<div class="alert dark alert-icon alert-success alert-dismissible" role="alert" id="Success" style="display:none">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+    </button>
+    <i class="icon wb-check" aria-hidden="true"></i><span id="Successfully"></span>
+</div> 
+<div class="alert dark alert-warning alert-dismissible" role="alert" id="Failure" style="display:none">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+    </button>
+    <i class="icon wb-check" aria-hidden="true"></i> <span id="FailureMSG"></span>
+</div>
+<div class="page-header">
+    <h1 class="page-title"><i class="fa fa-circle" aria-hidden="true"></i> User Property Mapping</h1>
+    <div class="page-header-actions">
+    </div>
+</div>
+ 
+ 
+<div class="panel" ng-app="MyApp" ng-controller="MyController">
+    <header class="panel-heading"></header>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-15">
+                    @*<span>@Session["User"]</span>*@
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2" style="float: right !important;padding: 5px; margin-right: 15px;">
+            <input type="text" class="form-control" placeholder="Search User" ng-model="searchrow">
+        </div>
+        <div class="col-md-12 scrolcss">
+            <table class="col-md-12 table-bordered table-striped table-condensed cf drag" id="ball">
+                <thead class="cf">
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Id</th>
+                        <th>User Type</th>
+                        <th>Map</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="gradeA" ng-repeat="u in Users | filter : searchrow">
+                        <td data-title="UserName">{{u.UserName}}</td>
+                        <td data-title="LoginId">{{u.LoginId}}</td>
+                        <td data-title="UserType">{{u.UserTypeName}}</td>
+                        <td data-title="edit">
+                            @*Url.Action("AllMappingAccommodations", "Home", new { A_UserId = row["UserId"] })*@
+                            <a href="" class="btn btn-sm btn-icon btn-pure btn-default on-default" ng-click="GetMapAccommdation(u.UserId,u.UserName);" data-original-title="Assigning-Accommodation" data-toggle="modal" data-target="#myModal"><i class="icon wb-pencil" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Button to Open the Modal -->
+   
+    <!-- The Modal start-->
+    <div class="modal modal-demo" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content modal-con-demo"> 
+
+                <div class="alert dark alert-icon alert-success alert-dismissible SuccessalertAdd" role="alert" id="SuccessalertMap" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <i class="icon wb-check SuccessfullyalertAdd" aria-hidden="true"></i><span id="SuccessfullyalertMap"></span>
+                </div>
+                <div class="alert dark alert-warning alert-dismissible FailurealertAdd" role="alert" id="FailurealertMap" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <i class="icon wb-check FailureMSGalertAdd" aria-hidden="true"></i> <span id="FailureMSGalertMap"></span>
+                </div>
+                <div class="alert dark alert-icon alert-success alert-dismissible" role="alert" id="Successalert" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <i class="icon wb-check" aria-hidden="true"></i><span id="Successfullyalert"></span>
+                </div>
+                <div class="alert dark alert-warning alert-dismissible" role="alert" id="Failurealert" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <i class="icon wb-check" aria-hidden="true"></i> <span id="FailureMSGalert"></span>
+                </div>
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Property Map / Un-Map To : {{UserName}}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div> 
+                <!-- Modal body -->
+                <div class="modal-body modal-bdy-demo">  
+                          
+                    <div class="col-md-3" style="float: right !important;padding: 5px;"> 
+                        <input type="text" class="form-control" placeholder="Search User" style="width: 50%;float: right;margin-bottom: 4px;" ng-model="searchFishs"><button type="button" class="btn btn-danger" data-toggle="modal" style="float: right;" data-target="#GetUnmapAccommodations" ng-click="AccommodationLoad()">Map-Property</button>
+
+                    </div>
+                   
+                    <table class="col-md-12 table-bordered table-striped table-condensed cf">
+                        <thead class="cf">
+                            <tr>
+                                <th>User Name</th>
+                                <th>Accommodation Id</th>
+                                <th>Accommodation Name</th>
+                                <th>Un-Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="gradeA" ng-repeat="M in MappedAccommodation | filter : searchFishs">
+                                <td data-title="UserName">{{M.UserName}}</td>
+                                <td data-title="AccommodationId">{{M.AccommodationId}}</td>
+                                <td data-title="AccommodationName">{{M.AccommodationName}}</td>
+                                <td data-title="un-map">
+                                    @*Url.Action("AllMappingAccommodations", "Home", new { A_UserId = row["UserId"] })*@
+                                    <a href="" class="btn btn-sm btn-icon btn-pure btn-default on-default" data-original-title="Remove-Accommodation" data-toggle="tooltip" ng-click="RemoveMapAccommodation(M.UserId,M.AccommodationId);"><i class="icon wb-close" aria-hidden="true"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table> 
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal End-->
+    <!-- Modal -->  
+        <div class="modal fade modal-fade-in-scale-up" id="GetUnmapAccommodations" aria-hidden="true"
+             aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-simple">
+                <div class="modal-content" style="top: 70px;height: 270px;border: red 1px solid;">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">Assign Property</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input value="{{UserId}}" type="hidden" name="UserId" id="MUserId" />
+                                <select class="form-control" multiple data-plugin="select2" name="AccommodationId[]" id="FindingAccmmodation"></select>
+
+                                <img src="~/Image/demo_wait.gif" id="imgLoading"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="MapAccommodationSubmit()">Assign</button> 
+                    </div>
+                </div>
+            </div>
+        </div> 
+    <!-- End Modal -->
+</div>
+
+<script>
+    var app = angular.module('MyApp', ['ui.bootstrap'])
+    app.filter('startFrom', function () {
+        return function (input, start) {
+            if (input) {
+                start = +start;
+                return input.slice(start);
+            }
+            return [];
+        };
+    });
+    app.controller('MyController', function ($scope, $http, $window) {
+        //Get All User
+        var request = {
+            method: 'get',
+            url: '/JsonAng/GetAllUsers',
+            dataType: 'json',
+            contentType: "application/json"
+        };
+        $scope.arrBirds = new Array;
+
+        $http(request)
+            .success(function (jsonData) {
+                $scope.arrBirds = jsonData;
+                $scope.Users = $scope.arrBirds;
+            })
+            .error(function () {
+            });
+
+        //-------------- Get Mapped Accommodation User With Id
+        $scope.GetMapAccommdation = function (UserId, UserName) {
+            var request = {
+                method: 'Post',
+                url: '/JsonAng/MappedAccommodationUser',
+                dataType: 'json',
+                data: { 'UserId': UserId },
+                contentType: "application/json"
+            };
+            $scope.ArrayACType = new Array;
+            $http(request)
+                .success(function (jsonData) {
+                    $scope.showLoader = true;
+                    $scope.UserId = UserId;
+                    $scope.UserName = UserName;
+                    $scope.ArrayGetAccommodationdetails = jsonData;
+                    $scope.MappedAccommodation = $scope.ArrayGetAccommodationdetails;
+
+                    $scope.showLoader = false;
+                })
+                .error(function () {
+                    alert("Error");
+                    $("#Failure").show();
+                });
+
+        }
+        //-------------- Get Mapped Accommodation User With Id
+        $scope.RemoveMapAccommodation = function (UserId, AccommodationId)
+        {
+            $scope.MappedAccommodation = null;
+            var request = {
+                method: 'Post',
+                url: '/JsonAng/RemoveMappingAccommodations',
+                dataType: 'json',
+                data: { 'UserId': UserId, 'AccommodationId': AccommodationId },
+                contentType: "application/json"
+            };
+            $scope.ArrayACType = new Array;
+            $http(request)
+                .success(function (jsonData) {
+                    $scope.showLoader = true;
+                    $("#Successalert").show();
+                    $("#Successfullyalert").text(jsonData);
+                    var request = {
+                        method: 'Post',
+                        url: '/JsonAng/MappedAccommodationUser',
+                        dataType: 'json',
+                        data: { 'UserId': UserId },
+                        contentType: "application/json"
+                    };
+                    $scope.ArrayACType = new Array;
+                    $http(request)
+                        .success(function (jsonData) {
+                            $scope.showLoader = true;
+                            $scope.UserId = UserId;
+                            $scope.ArrayGetAccommodationdetails = jsonData;
+                            $scope.MappedAccommodation = $scope.ArrayGetAccommodationdetails;
+
+                            $scope.showLoader = false;
+                        })
+                        .error(function () {
+                            $("#Failure").show();
+                        });
+                    $scope.showLoader = false;
+                })
+                .error(function () {
+                    $("#Failurealert").show();
+                    $("#FailureMSGalert").text(jsonData.data);
+                });
+        }
+
+        $scope.AccommodationLoad = function ()
+        {
+            $('#FindingAccmmodation').empty();
+                   var UserId = $("#MUserId").val();
+                    $("#imgLoading").css("display", "block");
+                     var url = '@Url.Action("LoadAccommodation", "JsonAng")';
+                     $.ajax({
+                         type: "POST",
+                         url: url,
+                         data: { UserId: UserId},
+                         dataType: "json",
+                         success: function (result)
+                         {
+                             if (result == null || result=="")
+                             {
+                                 alert('Sorry Accommodation Not Available');
+                             }
+                             else
+                             { 
+                                 $('#FindingAccmmodation')
+                                     .empty()
+                                     .append('<option value="0" disabled></option>');
+                                 $.each(result, function (el, val, ) {
+                                     $('#FindingAccmmodation').append('<option value="' + val.AccommodationId + '">' + val.AccommodationId + " - " + val.AccommodationName + '</option>');
+                                 });
+                             }
+                             $("#imgLoading").css("display", "none");
+                         },
+                         error: function (result) {
+                             alert('null : Accommodation  ');
+                         }
+                     });
+        }
+       
+        $scope.MapAccommodationSubmit = function ()
+        {
+
+            var UserId = $("#MUserId").val();
+            var MappingAccommodationId = [] = $("#FindingAccmmodation").val();
+            console.log(MappingAccommodationId);
+         //GetUnMappedAccommodations
+           var request = {
+               method: 'Post',
+               url: '/JsonAng/MappingAccommodation',
+               dataType: 'json',
+               data: { 'UserId': UserId, 'MappingAccommodationId': MappingAccommodationId},
+               contentType: "application/json"
+           };
+           $http(request)
+               .success(function (jsonData) {
+                   $scope.showLoader = true;
+                   $("#SuccessalertMap").show();
+                   $("#SuccessfullyalertMap").text(jsonData);
+                   //$('#GetUnmapAccommodations').modal('toggle');
+                   $scope.showLoader = false;
+                   //getMapp Accommodations
+                   var request = {
+                       method: 'Post',
+                       url: '/JsonAng/MappedAccommodationUser',
+                       dataType: 'json',
+                       data: { 'UserId': UserId },
+                       contentType: "application/json"
+                   };
+                   $scope.ArrayACType = new Array;
+                   $http(request)
+                       .success(function (jsonData) {
+                           $scope.showLoader = true;
+                           $scope.UserId = UserId;
+                           $scope.ArrayGetAccommodationdetails = jsonData;
+                           $scope.MappedAccommodation = $scope.ArrayGetAccommodationdetails;
+                           $scope.showLoader = false;
+                       })
+                       .error(function () {
+                           alert("Error");
+                           $("#Failure").show();
+                       });
+               })
+               .error(function () {
+                   $("#FailurealertMap").show();
+                   $("#FailureMSGalertMap").text(jsonData.data);
+               });
+        }
+
+    });
+</script>
