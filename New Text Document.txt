@@ -54,4 +54,9 @@
             });
         } 
     });
+
+   $scope.currentPage = 1;
+        $scope.totalItems = $scope.items.length;
+        $scope.entryLimit = 20; // items per page
+        $scope.noOfPages = Math.ceil($scope.totalItems / $scope.entryLimit);
 </script>
